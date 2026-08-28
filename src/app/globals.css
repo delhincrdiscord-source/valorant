@@ -1,0 +1,649 @@
+@import "tailwindcss";
+
+/* ---- Valorant-inspired 3D & Premium Theme System ---- */
+@theme {
+  --color-val-red: #ff4655;
+  --color-val-red-dark: #bd3944;
+  --color-val-red-glow: rgba(255, 70, 85, 0.4);
+  --color-val-dark: #090e14;
+  --color-val-darker: #05080c;
+  --color-val-navy: #151f28;
+  --color-val-navy-light: #223140;
+  --color-val-teal: #12e2c4;
+  --color-val-teal-dark: #0ac8b9;
+  --color-val-teal-glow: rgba(18, 226, 196, 0.35);
+  --color-val-light: #f3efe6;
+  --color-val-muted: #8b978f;
+  --color-val-gold: #ffb800;
+
+  --font-sans: "Arial Narrow", "Roboto Condensed", "Segoe UI", Arial, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+  background-color: var(--color-val-dark);
+  color: var(--color-val-light);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 70, 85, 0.2), transparent 60%),
+    radial-gradient(circle at 85% 90%, rgba(18, 226, 196, 0.12), transparent 45%),
+    radial-gradient(circle at 10% 80%, rgba(255, 184, 0, 0.05), transparent 40%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%) 0 0 / 36px 36px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background: 
+    linear-gradient(90deg, transparent 49.9%, rgba(139, 151, 143, 0.04) 50%, transparent 50.1%),
+    linear-gradient(0deg, transparent 49.9%, rgba(139, 151, 143, 0.02) 50%, transparent 50.1%);
+  background-size: 60px 60px;
+}
+
+/* Dynamic 3D depth background reticles */
+.site-atmosphere {
+  position: fixed;
+  top: 10vh;
+  right: -14rem;
+  z-index: -2;
+  width: 46rem;
+  height: 46rem;
+  border: 1px solid rgba(18, 226, 196, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 80px rgba(18, 226, 196, 0.05), inset 0 0 80px rgba(18, 226, 196, 0.03);
+  animation: slow-spin 45s linear infinite;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.site-atmosphere::before,
+.site-atmosphere::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(255, 70, 85, 0.12);
+  border-radius: 50%;
+}
+.site-atmosphere::before {
+  inset: 6rem;
+  box-shadow: inset 0 0 40px rgba(255, 70, 85, 0.06);
+}
+.site-atmosphere::after {
+  inset: 14rem;
+  border-color: rgba(18, 226, 196, 0.15);
+}
+
+.site-main { position: relative; z-index: 1; }
+.site-footer { 
+  position: relative; 
+  z-index: 1; 
+  background: rgba(5, 8, 12, 0.85);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.nav-shell {
+  background: rgba(9, 14, 20, 0.82);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.5) inset;
+}
+
+/* 3D Brand Logo Mark */
+.brand-mark {
+  position: relative;
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  place-items: center;
+  border: 1px solid rgba(255, 70, 85, 0.6);
+  background: linear-gradient(135deg, rgba(255, 70, 85, 0.2), rgba(15, 25, 35, 0.8));
+  box-shadow: 
+    0 4px 12px rgba(255, 70, 85, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  transform: skewX(-10deg) translateZ(0);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.brand-mark::before,
+.brand-mark span {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 16px;
+  background: linear-gradient(180deg, #ff6b78, #bd3944);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  clip-path: polygon(0 0, 100% 20%, 100% 100%, 0 75%);
+}
+.brand-mark::before { left: 8px; transform: rotate(-18deg); }
+.brand-mark span { right: 8px; transform: rotate(18deg); }
+@media (hover: hover) {
+  .group:hover .brand-mark {
+    transform: skewX(-14deg) scale(1.08) rotate(3deg);
+    border-color: var(--color-val-red);
+    box-shadow: 0 6px 20px rgba(255, 70, 85, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* 3D Glass Hero Panel with Layered Depth & Bevels */
+.hero-panel {
+  background:
+    linear-gradient(135deg, rgba(21, 31, 40, 0.94), rgba(5, 8, 12, 0.96)),
+    repeating-linear-gradient(90deg, transparent 0 78px, rgba(236, 232, 225, 0.03) 78px 79px);
+  clip-path: polygon(0 0, calc(100% - 42px) 0, 100% 42px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(255, 70, 85, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 3px 0 0 rgba(255, 70, 85, 0.9);
+  backdrop-filter: blur(12px);
+  transform-style: preserve-3d;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.hero-panel::before {
+  content: "02";
+  position: absolute;
+  right: -0.02em;
+  bottom: -0.2em;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.005));
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: clamp(14rem, 36vw, 28rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.09em;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(45deg, transparent 48%, var(--color-val-red) 49% 54%, transparent 55%);
+}
+.hero-title { 
+  text-wrap: balance; 
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5); 
+}
+.hero-title::first-line { color: var(--color-val-light); }
+
+/* Interactive 3D Aim Reticle */
+.hero-reticle {
+  position: absolute;
+  right: 8%;
+  top: 15%;
+  width: 110px;
+  height: 110px;
+  border: 1px solid rgba(18, 226, 196, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(18, 226, 196, 0.1), inset 0 0 20px rgba(18, 226, 196, 0.08);
+  animation: float-reticle 7s ease-in-out infinite;
+  pointer-events: none;
+}
+.hero-reticle::before,
+.hero-reticle::after {
+  content: "";
+  position: absolute;
+  background: rgba(18, 226, 196, 0.3);
+  box-shadow: 0 0 8px rgba(18, 226, 196, 0.5);
+}
+.hero-reticle::before { top: 50%; left: -20px; width: 150px; height: 1px; }
+.hero-reticle::after { left: 50%; top: -20px; width: 1px; height: 150px; }
+
+/* 3D Step Cards */
+.step-item { 
+  position: relative;
+  min-height: 130px; 
+  background: linear-gradient(160deg, rgba(15, 25, 35, 0.95), rgba(5, 8, 12, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.step-line { transition: all 0.3s ease; }
+@media (hover: hover) {
+  .step-item:hover { 
+    background: linear-gradient(160deg, rgba(34, 49, 64, 0.95), rgba(15, 25, 35, 0.98));
+    transform: translateY(-4px) translateZ(10px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 15px rgba(255, 70, 85, 0.2);
+  }
+  .step-item:hover .step-line { 
+    width: 48px; 
+    background: var(--color-val-red);
+    box-shadow: 0 0 8px var(--color-val-red);
+  }
+}
+
+/* 3D Registration Glass Panel with floating movement and background glow */
+.registration-panel {
+  position: relative;
+  background:
+    linear-gradient(155deg, rgba(21, 31, 40, 0.94), rgba(5, 8, 12, 0.97)),
+    radial-gradient(circle at 100% 0%, rgba(255, 70, 85, 0.15), transparent 45%);
+  box-shadow: 
+    0 35px 70px -15px rgba(0, 0, 0, 0.95),
+    0 0 50px rgba(255, 70, 85, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  transform-style: preserve-3d;
+  animation: float-panel 6s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.registration-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-val-red), rgba(255, 70, 85, 0.3) 50%, var(--color-val-teal));
+  box-shadow: 0 0 12px rgba(255, 70, 85, 0.5);
+}
+
+@keyframes float-panel {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+    box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 70, 85, 0.2);
+  }
+  50% {
+    transform: translateY(-10px) rotateX(1.5deg) rotateY(-1deg);
+    box-shadow: 0 45px 85px -15px rgba(0, 0, 0, 0.98), 0 0 65px rgba(18, 226, 196, 0.3);
+  }
+}
+
+@media (max-width: 639px) {
+  .nav-links { margin-right: -0.25rem; }
+  .link-underline::after { left: 0.55rem; right: 0.55rem; }
+  .hero-panel { clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+  .hero-reticle { display: none; }
+  .step-item { min-height: auto; }
+}
+
+/* Tactical uppercase headings with 3D letter shadow */
+.heading {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 800;
+}
+
+/* Angled 3D notch clip */
+.clip-notch {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+
+/* Focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-val-teal);
+  outline-offset: 3px;
+  box-shadow: 0 0 12px var(--color-val-teal-glow);
+}
+
+/* ---- Brackets Viewer 3D Styling Overrides ---- */
+.brackets-viewer {
+  --primary-background: #151f28;
+  --secondary-background: #05080c;
+  --match-background: #151f28;
+  --font-color: var(--color-val-light);
+  --win-color: var(--color-val-teal);
+  --loss-color: var(--color-val-red);
+  --label-color: var(--color-val-muted);
+  --hint-color: var(--color-val-muted);
+  --connector-color: #223140;
+  --border-color: #223140;
+  --border-hover-color: var(--color-val-teal);
+  --border-selected-color: var(--color-val-teal);
+  --text-size: 13px;
+  color: var(--color-val-light);
+}
+
+.brackets-viewer .match {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+}
+.brackets-viewer .match:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(18, 226, 196, 0.3);
+}
+
+/* Dynamic Scan Line Animation for Tactical Panels */
+.scan-beam {
+  position: relative;
+  overflow: hidden;
+}
+.scan-beam::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, rgba(18, 226, 196, 0.15), transparent);
+  animation: scan-line 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Pulsing Cyber Glow border */
+.glow-pulse-red {
+  animation: glow-pulse-red 3s ease-in-out infinite;
+}
+.glow-pulse-teal {
+  animation: glow-pulse-teal 3s ease-in-out infinite;
+}
+
+/* =====================================================================
+   3D Motion & Tactile Physics System
+   ===================================================================== */
+
+@keyframes scan-line {
+  0%   { top: -40%; }
+  50%  { top: 120%; }
+  100% { top: 120%; }
+}
+@keyframes glow-pulse-red {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 70, 85, 0.2); }
+  50%      { box-shadow: 0 0 35px rgba(255, 70, 85, 0.5); }
+}
+@keyframes glow-pulse-teal {
+  0%, 100% { box-shadow: 0 0 15px rgba(18, 226, 196, 0.2); }
+  50%      { box-shadow: 0 0 35px rgba(18, 226, 196, 0.5); }
+}
+@keyframes float-hero-card {
+  0%, 100% { transform: translateY(0px) rotateX(0deg); }
+  50%      { transform: translateY(-6px) rotateX(1deg); }
+}
+
+@keyframes victory-boom {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) translateZ(100px);
+    filter: blur(12px);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(0.96) translateZ(0);
+    filter: blur(0px);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  60%, 100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-x {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-victory-boom {
+  animation: victory-boom 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-x {
+  animation: scale-x 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.brackets-viewer h1,
+.brackets-viewer h2,
+.brackets-viewer h3 {
+  color: var(--color-val-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.brackets-viewer .participant.win .name {
+  color: var(--color-val-teal);
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(18, 226, 196, 0.4);
+}
+.brackets-viewer .participant.loss .name {
+  color: var(--color-val-muted);
+}
+
+/* =====================================================================
+   3D Motion & Tactile Physics System
+   ===================================================================== */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.9) translateZ(-20px); }
+  70%  { opacity: 1; transform: scale(1.02) translateZ(5px); }
+  100% { transform: scale(1) translateZ(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(36px) rotateY(-5deg); }
+  to   { opacity: 1; transform: translateX(0) rotateY(0); }
+}
+@keyframes sheen-sweep {
+  from { transform: translateX(-150%) skewX(-20deg); }
+  to   { transform: translateX(300%) skewX(-20deg); }
+}
+@keyframes text-shimmer {
+  to { background-position: 200% center; }
+}
+@keyframes dot-ping {
+  0%   { box-shadow: 0 0 0 0 var(--ping-color, rgba(18, 226, 196, 0.6)); }
+  70%  { box-shadow: 0 0 0 9px rgba(18, 226, 196, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(18, 226, 196, 0); }
+}
+@keyframes slow-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes float-reticle {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.6; }
+  50% { transform: translate3d(-10px, 14px, 0) rotate(10deg); opacity: 1; }
+}
+
+/* --- Entrance utilities --- */
+.anim-rise        { animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-fade        { animation: fade-in 0.6s ease both; }
+.anim-pop         { animation: pop-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-slide-right { animation: slide-in-right 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Stagger helpers */
+.d-1 { animation-delay: 0.06s; }
+.d-2 { animation-delay: 0.12s; }
+.d-3 { animation-delay: 0.18s; }
+.d-4 { animation-delay: 0.24s; }
+.d-5 { animation-delay: 0.30s; }
+.d-6 { animation-delay: 0.36s; }
+
+/* Auto-stagger direct children */
+.reveal-children > * { animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.reveal-children > *:nth-child(1) { animation-delay: 0.04s; }
+.reveal-children > *:nth-child(2) { animation-delay: 0.10s; }
+.reveal-children > *:nth-child(3) { animation-delay: 0.16s; }
+.reveal-children > *:nth-child(4) { animation-delay: 0.22s; }
+.reveal-children > *:nth-child(5) { animation-delay: 0.28s; }
+.reveal-children > *:nth-child(6) { animation-delay: 0.34s; }
+
+/* --- 3D Interaction utilities --- */
+
+/* 3D Button Press and Elevate */
+.press {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, box-shadow;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.press:active { 
+  transform: translateY(2px) scale(0.97); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+@media (hover: hover) {
+  .press:hover { 
+    transform: translateY(-3px) scale(1.01); 
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* 3D Valorant Red Primary Button */
+.btn-3d-red {
+  position: relative;
+  background: linear-gradient(180deg, #ff5463 0%, #ff4655 50%, #bd3944 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 24px rgba(255, 70, 85, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) {
+  .btn-3d-red:hover {
+    background: linear-gradient(180deg, #ff6b78 0%, #ff5463 50%, #d43d4a 100%);
+    box-shadow: 
+      0 14px 32px rgba(255, 70, 85, 0.65),
+      0 6px 12px rgba(0, 0, 0, 0.6),
+      inset 0 1px 2px rgba(255, 255, 255, 0.7),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(-4px);
+  }
+}
+.btn-3d-red:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 4px 12px rgba(255, 70, 85, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 3D Card Lift with Perspective & Glow */
+.card-lift {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.card-lift:active { transform: translateY(-1px); }
+@media (hover: hover) {
+  .card-lift:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(18, 226, 196, 0.5);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.6),
+      0 0 25px rgba(18, 226, 196, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Animated left-anchored underline for nav links */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.3rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-val-red), var(--color-val-teal));
+  box-shadow: 0 0 8px var(--color-val-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.link-underline[data-active="true"]::after { transform: scaleX(1); }
+@media (hover: hover) {
+  .link-underline:hover::after { transform: scaleX(1); }
+}
+
+/* Diagonal sheen sweep */
+.sheen { position: relative; overflow: hidden; isolation: isolate; }
+.sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .sheen:hover::before { animation: sheen-sweep 0.85s cubic-bezier(0.2, 0.8, 0.2, 1); }
+}
+
+/* Shimmering gradient text */
+.text-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-val-teal) 20%,
+    #ffffff 50%,
+    var(--color-val-teal) 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: text-shimmer 4s linear infinite;
+}
+
+/* Pulsing status dot */
+.dot-ping { animation: dot-ping 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+
+/* 3D Depth Input Fields */
+.field-anim {
+  background: rgba(5, 8, 12, 0.85);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.field-anim:focus {
+  background: rgba(9, 14, 20, 0.95);
+  border-color: var(--color-val-teal) !important;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(18, 226, 196, 0.35),
+    0 0 0 2px rgba(18, 226, 196, 0.2);
+}
+
+/* Reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

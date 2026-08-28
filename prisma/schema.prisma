@@ -1,0 +1,87 @@
+// Valorant 2v2 Skirmish — data model
+// Enums are stored as plain strings (validated with Zod in the app layer) for
+// portability across databases and easy CSV export.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A single player within a registered duo.
+model Player {
+  id              String   @id @default(cuid())
+  discordUsername String
+  // Nullable so existing registrations can be migrated without inventing IDs.
+  // New registrations always provide this value through the API.
+  discordUserId   String?  @unique
+  riotId          String // "Name#TAG" — original casing, for display
+  // Lowercased Riot ID used for case-insensitive dedup. Valorant IDs are
+  // case-insensitive, but Postgres @unique is case-sensitive, so we need a
+  // separate normalized key to block re-registering "Phoenix#NA1" as
+  // "phoenix#na1".
+  riotIdKey       String   @unique
+  currentRank     String
+  peakRank        String
+  region          String
+  agentRole       String
+  rulesAgreed     Boolean  @default(false)
+
+  // Derived from the rank labels for balancing (see lib/constants.ts).
+  rankValue     Int
+  peakRankValue Int
+
+  status    String   @default("registered") // "registered" | "paired"
+  team      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId    String?
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// A self-formed 2-player squad, created at registration time.
+model Team {
+  id                String   @id @default(cuid())
+  name              String
+  combinedRankValue Int      @default(0)
+  seed              Int?
+  players           Player[]
+  createdAt         DateTime @default(now())
+
+  @@index([seed])
+}
+
+/// Rolling log of registration attempts, used by the DB-backed rate limiter.
+/// Rows are pruned after their window passes; see lib/rate-limit.ts.
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String // e.g. "ip:1.2.3.4" | "discord:123..." | "riot:phoenix#na1"
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+}
+
+/// Singleton row (id = "global") holding event-wide toggles.
+model Setting {
+  id                String  @id @default("global")
+  tournamentName    String  @default("Valorant 2v2 Skirmish")
+  registrationOpen  Boolean @default(true)
+  pairingsPublished Boolean @default(false)
+  bracketPublished  Boolean @default(false)
+  updatedAt         DateTime @updatedAt
+}
+
+/// Bracket state — the full brackets-manager dataset dumped to JSONB.
+model Tournament {
+  id        String   @id @default("main")
+  name      String   @default("Valorant 2v2 Skirmish")
+  status    String   @default("pending") // "pending" | "active" | "complete"
+  data      Json? // brackets-manager Database dump (participants/stages/rounds/matches/...)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
