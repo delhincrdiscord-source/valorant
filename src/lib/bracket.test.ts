@@ -113,6 +113,7 @@ describe("getMatchFormat", () => {
         { id: 11, group_id: 2, round_id: 2, number: 1, status: 2, opponent1: null, opponent2: null },
         { id: 12, group_id: 3, round_id: 3, number: 1, status: 2, opponent1: null, opponent2: null },
       ],
+      match_game: [],
     };
   }
 

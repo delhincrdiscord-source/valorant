@@ -196,6 +196,19 @@ export default function AdminControls({
                   ? "Re-generate bracket"
                   : "Generate bracket"}
             </button>
+            <button
+              disabled={disabled || teamCount < 1}
+              onClick={() =>
+                post(
+                  "/api/admin/notify-registrants",
+                  "notify",
+                  "Send a Discord ping to all registered players? This mentions every player in the registration channel.",
+                )
+              }
+              className="press heading clip-notch rounded-sm border border-val-red/60 bg-val-red/15 px-5 py-2.5 text-xs text-val-red backdrop-blur hover:bg-val-red/25 hover:shadow-[0_0_20px_rgba(233,69,96,0.35)] disabled:opacity-40 cursor-pointer"
+            >
+              {busy === "notify" ? "Notifying…" : "Notify registered players"}
+            </button>
             <span className="text-xs font-semibold text-val-muted">
               {teamCount} teams registered
             </span>
